@@ -40,7 +40,7 @@ RegisterNetEvent('map_lumberjack:makeDamage', function(index)
     local coords = vector3(data.coords.x, data.coords.y, data.coords.y)
     local dist = #(xPlayer.getCoords(true) - coords)
     
-    if not data or not dutyPlayers[source] and dist > 3 then
+    if not data or not dutyPlayers[source] or dist > 3 then
         return false
     end
 
