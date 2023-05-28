@@ -37,8 +37,10 @@ end)
 RegisterNetEvent('map_lumberjack:makeDamage', function(index)
     local data = trees[index]
     local xPlayer = ESX.GetPlayerFromId(source)
-
-    if not data or not dutyPlayers[source] then
+    local coords = vector3(data.coords.x, data.coords.y, data.coords.y)
+    local dist = #(xPlayer.getCoords(true) - coords)
+    
+    if not data or not dutyPlayers[source] and dist > 3 then
         return false
     end
 
