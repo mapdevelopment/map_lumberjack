@@ -6,6 +6,8 @@ Config.Duty = vector4(-568.536255, 5252.373535, 69.477661, 62.362206)
 Config.SellPoint = vector3(-568.404419, 5272.628418, 70.241699)
 Config.UsePED = true
 Config.PedModel = 'a_m_m_salton_04'
+Config.RequireItem = '' -- axe for example
+
 Config.Trees = {
     { x = -612.672546, y = 5243.696777, z = 70.213135 },
     { x = -615.573608, y = 5236.074707, z = 71.342163},
