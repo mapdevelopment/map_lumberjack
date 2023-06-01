@@ -1,7 +1,7 @@
 Config = {}
 
 Config.FreelanceJob = true
-Config.JobName = 'police' -- If Config.FreelanceJob = false
+Config.JobName = '' -- If Config.FreelanceJob = false
 Config.Duty = vector4(-568.536255, 5252.373535, 69.477661, 62.362206)
 Config.SellPoint = vector3(-568.404419, 5272.628418, 70.241699)
 Config.UsePED = true
