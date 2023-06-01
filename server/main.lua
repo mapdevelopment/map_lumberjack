@@ -31,7 +31,7 @@ end)
 
 ESX.RegisterServerCallback('map_lumberjack:hasItem', function(src, cb)
     local xPlayer = ESX.GetPlayerFromId(src)
-    cb(xPlayer.getInventoryItem('water').count)
+    cb(xPlayer.getInventoryItem(Config.RequireItem).count)
 end)
 
 RegisterNetEvent('map_lumberjack:makeDamage', function(index)
