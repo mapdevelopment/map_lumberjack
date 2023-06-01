@@ -37,15 +37,14 @@ end)
 RegisterNetEvent('map_lumberjack:makeDamage', function(index)
     local data = trees[index]
     local xPlayer = ESX.GetPlayerFromId(source)
-    --local coords = vector3(data.coords.x, data.coords.y, data.coords.y)
-    --local dist = #(xPlayer.getCoords(true) - coords)
-    
+
     if not data or not dutyPlayers[source] then
         return false
     end
 
     trees[index].health -= 20
     syncTrees()
+
     if data.health == 0 then
         xPlayer.addInventoryItem('wood', 1)
         Citizen.SetTimeout(Config.GrowingTime, function()
@@ -55,17 +54,51 @@ RegisterNetEvent('map_lumberjack:makeDamage', function(index)
     end
 end)
 
+ESX.RegisterServerCallback('map_lumberjack:makeDamage', function(source, cb, index)
+    local data = trees[index]
+    local xPlayer = ESX.GetPlayerFromId(source)
+
+    if not data or not dutyPlayers[source] then
+        cb(false)
+    end
+
+    trees[index].health -= 20
+    syncTrees()
+    cb(true)
+
+    if data.health == 0 then
+        xPlayer.addInventoryItem('wood', 1)
+        Citizen.SetTimeout(Config.GrowingTime, function()
+            trees[index].health = 100
+            syncTrees()
+        end)
+    end
+
+end)
+
 function syncTrees()
     TriggerClientEvent('map_lumberjack:syncTrees', -1, trees)
 end
 
 RegisterNetEvent('map_lumberjack:sellAllWood', function()
     local xPlayer = ESX.GetPlayerFromId(source)
+    local dist = #(xPlayer.getCoords(true) - Config.SellPoint)
+    if (dist > 2) then
+        return false
+    end
+
     local inventory = xPlayer.getInventory(true)
+    local total = 0
+
     for k,v in pairs(inventory) do
         if k == 'wood' then
             xPlayer.addAccountMoney('money', v * Config.WoodPrice)
             xPlayer.removeInventoryItem('wood', v)
+            total += 1
         end
+    end
+
+    if total > 0 then
+        xPlayer.showNotification('You sold all the wood and got ' .. total * Config.WoodPrice .. '$')
     end
 end)

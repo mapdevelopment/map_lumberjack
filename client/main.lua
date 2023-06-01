@@ -129,7 +129,12 @@ RegisterCommand('cutatree', function()
         FreezeEntityPosition(PlayerPedId(), true)
         Citizen.Wait(3000)
 
-        TriggerServerEvent('map_lumberjack:makeDamage', closest)
+        ESX.TriggerServerCallback('map_lumberjack:makeDamage', function(data)
+            if data then
+                --print('You made damage')
+            end
+        end, closest)
+
         FreezeEntityPosition(PlayerPedId(), false)
         DeleteObject(axe)
     end)
@@ -141,14 +146,14 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(sleep)
         local coords = GetEntityCoords(PlayerPedId())
-        local sellPoint = #(coords - vector3(Config.SellPoint.x, Config.SellPoint.y, Config.SellPoint.z))
+        local sellPoint = #(coords - Config.SellPoint)
         local dutyPED = #(coords - vector3(Config.Duty.x, Config.Duty.y, Config.Duty.z))
         if (dutyPED < 8) then
             sleep = 5
             MessageWithBackground(vector3(Config.Duty.x, Config.Duty.y, Config.Duty.z + 2), '~INPUT_CONTEXT~ Start working as Lumberjack')
         elseif sellPoint < 15 and duty then
             sleep = 5
-            MessageWithBackground(vector3(Config.SellPoint.x, Config.SellPoint.y, Config.SellPoint.z), '~INPUT_CONTEXT~ Sell all wood')
+            MessageWithBackground(Config.SellPoint, '~INPUT_CONTEXT~ Sell all wood')
         else
             sleep = 500
         end
@@ -159,11 +164,10 @@ end)
 RegisterCommand('startLumberjackDuty', function()
     local coords = GetEntityCoords(PlayerPedId())
     local dist = #(coords - vector3(Config.Duty.x, Config.Duty.y, Config.Duty.z))
-    local sellPoint = #(coords - vector3(Config.SellPoint.x, Config.SellPoint.y, Config.SellPoint.z))
+    local sellPoint = #(coords - Config.SellPoint)
 
     if sellPoint < 2.0 and duty then
         TriggerServerEvent('map_lumberjack:sellAllWood')
-        ESX.ShowNotification('You sold all the wood')
     end
 
     if dist > 2 then
