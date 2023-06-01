@@ -94,7 +94,7 @@ RegisterNetEvent('map_lumberjack:sellAllWood', function()
         if k == 'wood' then
             xPlayer.addAccountMoney('money', v * Config.WoodPrice)
             xPlayer.removeInventoryItem('wood', v)
-            total += 1
+            total = v
         end
     end
 
