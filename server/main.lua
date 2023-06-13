@@ -34,25 +34,7 @@ ESX.RegisterServerCallback('map_lumberjack:hasItem', function(src, cb)
     cb(xPlayer.getInventoryItem(Config.RequireItem).count)
 end)
 
-RegisterNetEvent('map_lumberjack:makeDamage', function(index)
-    local data = trees[index]
-    local xPlayer = ESX.GetPlayerFromId(source)
 
-    if not data or not dutyPlayers[source] then
-        return false
-    end
-
-    trees[index].health -= 20
-    syncTrees()
-
-    if data.health == 0 then
-        xPlayer.addInventoryItem('wood', 1)
-        Citizen.SetTimeout(Config.GrowingTime, function()
-            trees[index].health = 100
-            syncTrees()
-        end)
-    end
-end)
 
 ESX.RegisterServerCallback('map_lumberjack:makeDamage', function(source, cb, index)
     local data = trees[index]
