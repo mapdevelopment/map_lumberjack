@@ -1,6 +1,6 @@
 
 local trees = {}
-local duty = true
+local duty = false
 
 Citizen.CreateThread(function()
     ESX.TriggerServerCallback('map_lumberjack:getTreesWithData', function(data)
@@ -145,17 +145,19 @@ Citizen.CreateThread(function()
     local sleep = 500
     while true do
         Citizen.Wait(sleep)
-        local coords = GetEntityCoords(PlayerPedId())
-        local sellPoint = #(coords - Config.SellPoint)
-        local dutyPED = #(coords - vector3(Config.Duty.x, Config.Duty.y, Config.Duty.z))
-        if (dutyPED < 8) then
-            sleep = 5
-            MessageWithBackground(vector3(Config.Duty.x, Config.Duty.y, Config.Duty.z + 2), '~INPUT_CONTEXT~ Start working as Lumberjack')
-        elseif sellPoint < 15 and duty then
-            sleep = 5
-            MessageWithBackground(Config.SellPoint, '~INPUT_CONTEXT~ Sell all wood')
-        else
-            sleep = 500
+        if duty then
+            local coords = GetEntityCoords(PlayerPedId())
+            local sellPoint = #(coords - Config.SellPoint)
+            local dutyPED = #(coords - vector3(Config.Duty.x, Config.Duty.y, Config.Duty.z))
+            if (dutyPED < 8) then
+                sleep = 5
+                MessageWithBackground(vector3(Config.Duty.x, Config.Duty.y, Config.Duty.z + 2), '~INPUT_CONTEXT~ Start working as Lumberjack')
+            elseif sellPoint < 15 and duty then
+                sleep = 5
+                MessageWithBackground(Config.SellPoint, '~INPUT_CONTEXT~ Sell all wood')
+            else
+                sleep = 500
+            end
         end
     end
 end)
