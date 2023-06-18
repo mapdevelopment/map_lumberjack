@@ -3,7 +3,7 @@ local trees = {}
 local duty = false
 
 Citizen.CreateThread(function()
-    ESX.TriggerServerCallback('map_lumberjack:getTreesWithData', function(data)
+    lib.callback('map_lumberjack:getTreesWithData', false, function(data)
         setTrees(data)
     end)
 end)
@@ -96,7 +96,7 @@ RegisterCommand('cutatree', function()
     end
 
 
-    ESX.TriggerServerCallback('map_lumberjack:hasItem', function(data)
+    lib.callback('map_lumberjack:hasItem', false, function(data)
         if not data then
             return false
         end
@@ -129,7 +129,7 @@ RegisterCommand('cutatree', function()
         FreezeEntityPosition(PlayerPedId(), true)
         Citizen.Wait(3000)
 
-        ESX.TriggerServerCallback('map_lumberjack:makeDamage', function(data)
+        lib.callback('map_lumberjack:makeDamage', false, function(data)
             if data then
                 --print('You made damage')
             end
@@ -167,14 +167,14 @@ RegisterCommand('startLumberjackDuty', function()
     local sellPoint = #(coords - Config.SellPoint)
 
     if sellPoint < 2.0 and duty then
-        TriggerServerEvent('map_lumberjack:sellAllWood')
+        lib.callback('map_lumberjack:sellAllWood')
     end
 
     if dist > 2 then
         return false
     end
     
-    ESX.TriggerServerCallback('map_lumberjack:duty', function(boolean)
+    lib.callback('map_lumberjack:duty', false, function(boolean)
         duty = boolean
         if (boolean) then
             ESX.ShowNotification('You have started your shift')
