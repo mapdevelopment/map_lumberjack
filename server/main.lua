@@ -1,7 +1,7 @@
 local dutyPlayers = {}
 local trees = {}
 
-ESX.RegisterServerCallback('map_lumberjack:duty', function(source, cb)
+lib.callback.register('map_lumberjack:duty', function(source)
     local xPlayer = ESX.GetPlayerFromId(source)
     local job = xPlayer.getJob()
     if not Config.FreelanceJob and job.name ~= Config.JobName then
@@ -10,10 +10,10 @@ ESX.RegisterServerCallback('map_lumberjack:duty', function(source, cb)
 
     if dutyPlayers[source] then
         dutyPlayers[source] = nil
-        cb(false)
+        return false
     else
         dutyPlayers[source] = true
-        cb(true)
+        return true
     end
 end)
 
@@ -25,27 +25,25 @@ Citizen.CreateThread(function()
     end
 end)
 
-ESX.RegisterServerCallback('map_lumberjack:getTreesWithData', function(_, cb)
-   cb(trees)
+lib.callback.register('map_lumberjack:getTreesWithData', function(_)
+   return trees
 end)
 
-ESX.RegisterServerCallback('map_lumberjack:hasItem', function(src, cb)
+lib.callback.register('map_lumberjack:hasItem', function(src)
     local xPlayer = ESX.GetPlayerFromId(src)
-    cb(xPlayer.getInventoryItem('water').count)
+    return xPlayer.getInventoryItem('water').count
 end)
 
-
-ESX.RegisterServerCallback('map_lumberjack:makeDamage', function(source, cb, index)
+lib.callback.register('map_lumberjack:makeDamage', function(source, index)
     local data = trees[index]
     local xPlayer = ESX.GetPlayerFromId(source)
 
     if not data or not dutyPlayers[source] then
-        cb(false)
+        return false
     end
 
-    trees[index].health -= 20
+    trees[index].health = trees[index].health - 20
     syncTrees()
-    cb(true)
 
     if data.health == 0 then
         xPlayer.addInventoryItem('wood', 1)
@@ -55,35 +53,37 @@ ESX.RegisterServerCallback('map_lumberjack:makeDamage', function(source, cb, ind
         end)
     end
 
+    return true
 end)
 
 function syncTrees()
     TriggerClientEvent('map_lumberjack:syncTrees', -1, trees)
 end
 
-RegisterNetEvent('map_lumberjack:sellAllWood', function()
-    if dutyPlayers[source] then
+lib.callback.register('map_lumberjack:sellAllWood', function()
+    local source = source
+
+    if not dutyPlayers[source] then
         return false
     end
 
     local xPlayer = ESX.GetPlayerFromId(source)
     local dist = #(xPlayer.getCoords(true) - Config.SellPoint)
-    if (dist > 2) then
-        return false
+
+    if dist > 2 then
+        xPlayer.showNotification('You are too far away from the sell point.')
+        return
     end
 
-    local inventory = xPlayer.getInventory(true)
-    local total = 0
-
-    for k,v in pairs(inventory) do
-        if k == 'wood' then
-            xPlayer.addAccountMoney('money', v * Config.WoodPrice)
-            xPlayer.removeInventoryItem('wood', v)
-            total = v
-        end
+    local woodCount = xPlayer.getInventoryItem('wood').count
+    if woodCount <= 0 then
+        xPlayer.showNotification('You do not have any wood to sell.')
+        return
     end
 
-    if total > 0 then
-        xPlayer.showNotification('You sold all the wood and got ' .. total * Config.WoodPrice .. '$')
-    end
+    local totalPrice = woodCount * Config.WoodPrice
+    xPlayer.addAccountMoney('money', totalPrice)
+    xPlayer.removeInventoryItem('wood', woodCount)
+
+    xPlayer.showNotification('You sold ' .. woodCount .. ' wood and received $' .. totalPrice)
 end)
